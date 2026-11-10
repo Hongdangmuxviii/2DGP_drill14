@@ -11,6 +11,11 @@ BIRD_BODY_LENGTH_M = 1.0
 BIRD_BODY_LENGTH_PX = BIRD_BODY_LENGTH_M * PIXEL_PER_METER
 BIRD_SCALE = BIRD_BODY_LENGTH_PX / SPRITE_BODY_LENGTH_PX
 
+# 시트를 5 x 3 균일 격자로 보고 자른다 (마지막 줄은 4칸 → 총 14 프레임)
+SHEET_W, SHEET_H = 918, 506
+CELL_W, CELL_H = SHEET_W / 5, SHEET_H / 3
+FRAMES_PER_FLAP = 14
+
 
 class Bird:
     image = None
@@ -22,7 +27,11 @@ class Bird:
         self.frame = 0
 
     def update(self):
-        pass
+        self.frame = (self.frame + 1) % FRAMES_PER_FLAP
 
     def draw(self):
-        pass
+        col, row = self.frame % 5, self.frame // 5
+        left = int(col * CELL_W)
+        bottom = int(SHEET_H - (row + 1) * CELL_H)
+        Bird.image.clip_draw(left, bottom, int(CELL_W), int(CELL_H),
+                             self.x, self.y, CELL_W * BIRD_SCALE, CELL_H * BIRD_SCALE)
