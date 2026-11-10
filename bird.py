@@ -11,10 +11,26 @@ BIRD_BODY_LENGTH_M = 1.0
 BIRD_BODY_LENGTH_PX = BIRD_BODY_LENGTH_M * PIXEL_PER_METER
 BIRD_SCALE = BIRD_BODY_LENGTH_PX / SPRITE_BODY_LENGTH_PX
 
-# 시트를 5 x 3 균일 격자로 보고 자른다 (마지막 줄은 4칸 → 총 14 프레임)
-SHEET_W, SHEET_H = 918, 506
-CELL_W, CELL_H = SHEET_W / 5, SHEET_H / 3
-FRAMES_PER_FLAP = 14
+# 시트 격자가 균일하지 않아(가로 182 px 간격, 세로 줄 간격 제각각)
+# 투명하지 않은 픽셀의 연결 영역 14개를 찾아 프레임마다 정확한 사각형을 측정했다.
+# (left, bottom, width, height) - pico2d 좌표계 (이미지 왼쪽 아래가 원점)
+FRAMES = (
+    ( 34, 362, 146, 143),  # 0
+    (216, 363, 146, 141),  # 1
+    (398, 364, 146, 130),  # 2
+    (555, 367, 171, 122),  # 3
+    (728, 370, 182,  88),  # 4
+    ( 34, 171, 146, 118),  # 5
+    (216, 166, 146, 124),  # 6
+    (398, 170, 146, 120),  # 7
+    (580, 180, 146, 109),  # 8
+    (762, 177, 146, 110),  # 9
+    ( 34,   6, 146, 108),  # 10
+    (216,   6, 146, 106),  # 11
+    (376,  23, 168,  88),  # 12
+    (546,  22, 180, 114),  # 13
+)
+FRAMES_PER_FLAP = len(FRAMES)
 
 
 class Bird:
@@ -30,8 +46,6 @@ class Bird:
         self.frame = (self.frame + 1) % FRAMES_PER_FLAP
 
     def draw(self):
-        col, row = self.frame % 5, self.frame // 5
-        left = int(col * CELL_W)
-        bottom = int(SHEET_H - (row + 1) * CELL_H)
-        Bird.image.clip_draw(left, bottom, int(CELL_W), int(CELL_H),
-                             self.x, self.y, CELL_W * BIRD_SCALE, CELL_H * BIRD_SCALE)
+        left, bottom, w, h = FRAMES[self.frame]
+        Bird.image.clip_draw(left, bottom, w, h,
+                             self.x, self.y, w * BIRD_SCALE, h * BIRD_SCALE)
