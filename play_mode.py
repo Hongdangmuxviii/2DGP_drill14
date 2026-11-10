@@ -4,6 +4,8 @@ import game_framework
 from grass import Grass
 from bird import Bird
 
+BIRD_COUNT = 10
+
 
 def handle_events():
     event_list = get_events()
@@ -18,8 +20,8 @@ def init():
     grass = Grass()
     game_world.add_object(grass, 0)
 
-    bird = Bird()
-    game_world.add_object(bird, 1)
+    for _ in range(BIRD_COUNT):
+        game_world.add_object(Bird(), 1)
 
 
 def pause():
