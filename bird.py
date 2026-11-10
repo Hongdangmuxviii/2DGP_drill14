@@ -1,5 +1,7 @@
 from pico2d import load_image
 
+import game_framework
+
 # 월드 스케일 : 배경 눈금자(ruler.png) 100 px = 3 m  →  10 px = 30 cm
 PIXEL_PER_METER = (10.0 / 0.3)
 
@@ -36,6 +38,10 @@ BIRD_BODY_LENGTH_M = 1.0
 BIRD_BODY_LENGTH_PX = BIRD_BODY_LENGTH_M * PIXEL_PER_METER
 BIRD_SCALE = BIRD_BODY_LENGTH_PX / SPRITE_BODY_LENGTH_PX
 
+# 날갯짓 초당 3 회, 1 회 = 14 프레임 → 초당 42 프레임 진행
+FLAPS_PER_SECOND = 3.0
+FRAMES_PER_SECOND = FLAPS_PER_SECOND * FRAMES_PER_FLAP
+
 
 class Bird:
     image = None
@@ -47,7 +53,7 @@ class Bird:
         self.frame = 0
 
     def update(self):
-        self.frame = (self.frame + 1) % FRAMES_PER_FLAP
+        self.frame = (self.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_FLAP
 
     def draw(self):
         left, bottom, w, h, eye_x, eye_y = FRAMES[int(self.frame)]
