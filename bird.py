@@ -87,5 +87,10 @@ class Bird:
         offset_x = (w / 2 - eye_x + SPRITE_EYE_TO_BODY_CENTER_PX) * BIRD_SCALE
         offset_y = (h / 2 - eye_y) * BIRD_SCALE
 
-        Bird.image.clip_draw(left, bottom, w, h,
-                             self.x + offset_x, self.y + offset_y, draw_w, draw_h)
+        if self.dir == 1:
+            Bird.image.clip_draw(left, bottom, w, h,
+                                 self.x + offset_x, self.y + offset_y, draw_w, draw_h)
+        else:
+            # 좌우 반전 시 x 보정값도 반대로
+            Bird.image.clip_composite_draw(left, bottom, w, h, 0, 'h',
+                                           self.x - offset_x, self.y + offset_y, draw_w, draw_h)
