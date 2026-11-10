@@ -54,6 +54,11 @@ def kmph_to_pps(kmph):
     mps = mpm / 60.0
     return mps * PIXEL_PER_METER
 
+# 비행 고도 (지면 기준, m) : 잔디 위 ~ 화면 위쪽
+GROUND_Y = 40
+FLY_ALTITUDE_M_MIN = 3.0
+FLY_ALTITUDE_M_MAX = 15.5
+
 
 class Bird:
     image = None
@@ -61,11 +66,15 @@ class Bird:
     def __init__(self):
         if Bird.image is None:
             Bird.image = load_image('bird_animation.png')
-        self.x, self.y = 800, 400
-        self.dir = 1
+
+        half = BIRD_BODY_LENGTH_PX / 2
+        self.x = random.uniform(half, get_canvas_width() - half)
+        self.y = GROUND_Y + random.uniform(FLY_ALTITUDE_M_MIN, FLY_ALTITUDE_M_MAX) * PIXEL_PER_METER
+        self.dir = random.choice((-1, 1))
+
         self.speed_pps = kmph_to_pps(random.uniform(FLY_SPEED_KMPH_MIN, FLY_SPEED_KMPH_MAX))
         self.frames_per_second = random.uniform(FLAPS_PER_SECOND_MIN, FLAPS_PER_SECOND_MAX) * FRAMES_PER_FLAP
-        self.frame = 0
+        self.frame = random.uniform(0, FRAMES_PER_FLAP)
 
     def update(self):
         dt = game_framework.frame_time
