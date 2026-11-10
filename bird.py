@@ -42,6 +42,18 @@ BIRD_SCALE = BIRD_BODY_LENGTH_PX / SPRITE_BODY_LENGTH_PX
 FLAPS_PER_SECOND = 3.0
 FRAMES_PER_SECOND = FLAPS_PER_SECOND * FRAMES_PER_FLAP
 
+# 비행 속도 25 km/h = 6.94 m/s = 231 px/s
+FLY_SPEED_KMPH = 25.0
+
+
+def kmph_to_pps(kmph):
+    mpm = kmph * 1000.0 / 60.0
+    mps = mpm / 60.0
+    return mps * PIXEL_PER_METER
+
+
+FLY_SPEED_PPS = kmph_to_pps(FLY_SPEED_KMPH)
+
 
 class Bird:
     image = None
@@ -50,10 +62,13 @@ class Bird:
         if Bird.image is None:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = 800, 400
+        self.dir = 1
         self.frame = 0
 
     def update(self):
-        self.frame = (self.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_FLAP
+        dt = game_framework.frame_time
+        self.frame = (self.frame + FRAMES_PER_SECOND * dt) % FRAMES_PER_FLAP
+        self.x += self.dir * FLY_SPEED_PPS * dt
 
     def draw(self):
         left, bottom, w, h, eye_x, eye_y = FRAMES[int(self.frame)]
