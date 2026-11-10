@@ -1,3 +1,5 @@
+import random
+
 from pico2d import load_image, get_canvas_width
 
 import game_framework
@@ -38,21 +40,19 @@ BIRD_BODY_LENGTH_M = 1.0
 BIRD_BODY_LENGTH_PX = BIRD_BODY_LENGTH_M * PIXEL_PER_METER
 BIRD_SCALE = BIRD_BODY_LENGTH_PX / SPRITE_BODY_LENGTH_PX
 
-# 날갯짓 초당 3 회, 1 회 = 14 프레임 → 초당 42 프레임 진행
-FLAPS_PER_SECOND = 3.0
-FRAMES_PER_SECOND = FLAPS_PER_SECOND * FRAMES_PER_FLAP
+# 날갯짓 초당 약 3 회 (새마다 2.7 ~ 3.3 회), 1 회 = 14 프레임
+FLAPS_PER_SECOND_MIN = 2.7
+FLAPS_PER_SECOND_MAX = 3.3
 
-# 비행 속도 25 km/h = 6.94 m/s = 231 px/s
-FLY_SPEED_KMPH = 25.0
+# 비행 속도 새마다 20 ~ 30 km/h (평균 25 km/h = 231 px/s)
+FLY_SPEED_KMPH_MIN = 20.0
+FLY_SPEED_KMPH_MAX = 30.0
 
 
 def kmph_to_pps(kmph):
     mpm = kmph * 1000.0 / 60.0
     mps = mpm / 60.0
     return mps * PIXEL_PER_METER
-
-
-FLY_SPEED_PPS = kmph_to_pps(FLY_SPEED_KMPH)
 
 
 class Bird:
@@ -63,13 +63,15 @@ class Bird:
             Bird.image = load_image('bird_animation.png')
         self.x, self.y = 800, 400
         self.dir = 1
+        self.speed_pps = kmph_to_pps(random.uniform(FLY_SPEED_KMPH_MIN, FLY_SPEED_KMPH_MAX))
+        self.frames_per_second = random.uniform(FLAPS_PER_SECOND_MIN, FLAPS_PER_SECOND_MAX) * FRAMES_PER_FLAP
         self.frame = 0
 
     def update(self):
         dt = game_framework.frame_time
-        self.frame = (self.frame + FRAMES_PER_SECOND * dt) % FRAMES_PER_FLAP
+        self.frame = (self.frame + self.frames_per_second * dt) % FRAMES_PER_FLAP
 
-        self.x += self.dir * FLY_SPEED_PPS * dt
+        self.x += self.dir * self.speed_pps * dt
         # 몸통 절반이 화면 끝에 닿으면 방향 전환
         half = BIRD_BODY_LENGTH_PX / 2
         if self.x > get_canvas_width() - half:
